@@ -1,9 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Decom Request</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZEzI7PiIM+xKtfbO+Xr5o"
+          crossorigin="anonymous">
+</head>
+<body>
 <div class="container">
     <h2>Decom Request</h2>
     <form method="post" id="decom-form">
         {% csrf_token %}
         <div class="form-group">
-            <label>Collection Name:</label>
+            <label for="Collection">Collection Name:</label>
+            <!-- Select element to choose a collection -->
             <select name="collection" id="Collection" class="form-control">
                 <option value="0">--Select Collection--</option>
                 {% for collection in Collection %}
@@ -12,42 +24,47 @@
             </select>
         </div>
         <div class="form-group">
-            <label>Workflow Name:</label>
+            <label for="Workflow">Workflow Name:</label>
+            <!-- Select element to choose a workflow -->
             <select name="workflow" id="Workflow" class="form-control">
                 <option value="0">--Select Workflow--</option>  
             </select>
         </div>
 
+        <!-- Submit button to send the form data to the server -->
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 
+<!-- JavaScript code to populate the workflows based on the selected collection -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function(){
- 
- var Collection = $("#Collection");
- var Workflow = $("#Workflow");
- var $workflowOptions = Workflow.find('option');
+    $(document).ready(function () {
 
- Collection.on('change',function(){
-    var collection_id = this.value;
-    var workflows_url = '/get_workflows/' + collection_id + '/';
-    
-    // get the workflows based on the selected collection
-    $.ajax({
-        url: workflows_url,
-        success: function(result){
-            Workflow.html($workflowOptions);
-            $.each(result, function(i, item){
-                Workflow.append('<option value="' + item.id + '">' +  item.workflow_name + ' - ' + "(" + item.workflow_id + ")" + '</option>');
+        var Collection = $("#Collection");
+        var Workflow = $("#Workflow");
+        var $workflowOptions = Workflow.find('option');
+
+        Collection.on('change', function () {
+            var collection_id = this.value;
+            var workflows_url = '/get_workflows/' + collection_id + '/';
+
+            // Send an AJAX request to get the workflows based on the selected collection
+            $.ajax({
+                url: workflows_url,
+                success: function (result) {
+                    Workflow.html($workflowOptions);
+                    $.each(result, function (i, item) {
+                        // Add each workflow as an option to the Workflow select element
+                        Workflow.append('<option value="' + item.id + '">' + item.workflow_name + ' - ' + "(" + item.workflow_id + ")" + '</option>');
+                    });
+                    Workflow.trigger('change');
+                }
             });
-            Workflow.trigger('change');
-        }
-    });
-    
- });
- 
-}); 
-</script>
 
+        });
+
+    });
+</script>
+</body>
+</html>
