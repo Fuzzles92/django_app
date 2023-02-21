@@ -1,0 +1,53 @@
+<div class="container">
+    <h2>Decom Request</h2>
+    <form method="post" id="decom-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Collection Name:</label>
+            <select name="collection" id="Collection" class="form-control">
+                <option value="0">--Select Collection--</option>
+                {% for collection in Collection %}
+                    <option value="{{ collection.id }}">{{ collection.collection_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Workflow Name:</label>
+            <select name="workflow" id="Workflow" class="form-control">
+                <option value="0">--Select Workflow--</option>  
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+ 
+ var Collection = $("#Collection");
+ var Workflow = $("#Workflow");
+ var $workflowOptions = Workflow.find('option');
+
+ Collection.on('change',function(){
+    var collection_id = this.value;
+    var workflows_url = '/get_workflows/' + collection_id + '/';
+    
+    // get the workflows based on the selected collection
+    $.ajax({
+        url: workflows_url,
+        success: function(result){
+            Workflow.html($workflowOptions);
+            $.each(result, function(i, item){
+                Workflow.append('<option value="' + item.id + '">' +  item.workflow_name + ' - ' + "(" + item.workflow_id + ")" + '</option>');
+            });
+            Workflow.trigger('change');
+        }
+    });
+    
+ });
+ 
+}); 
+</script>
+
